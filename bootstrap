@@ -1,0 +1,18 @@
+#!/bin/sh
+
+echo "bootstrap: '$(pwd)'"
+
+progs="autoconf automake"
+
+for p in ${progs}; do
+	if test -z "$(${p} --version 2>/dev/null)"; then
+		echo "Please install ${p}" >&2
+		result=1
+	fi
+done
+
+[ -z ${result} ] || exit 1
+
+mkdir -p m4
+
+exec autoreconf --force --install ${@}
