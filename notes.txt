@@ -1,0 +1,83 @@
+Hi,
+
+Some notes and thoughts on my current v1.0 servo-check program.
+
+I've set the project up as a standard autotools project.  To build you should be 
+able to just run 'configure', 'make', then './servo-check -h', either inside the 
+sources, or in a separate build directory.  If you prefer building within a
+Docker container you can use my Ubuntu based tdd-builder container image that
+has all the required toolchain and autotools packages installed: 
+
+  docker pull glevand/tdd-builder:1-amd64
+
+I've included a test script 'check-servo-check.sh'.  It currently just does some 
+simple tests on the parsing of command line arguments and the sensor data.  Run 
+'check-servo-check.sh -h' to see the help.
+
+The Challenge Guidelines specifically state that the program will run on Ubuntu 
+Linux, so I took this to mean that the program is intended to be a diagnostic 
+program which will be run on input data collected prior.
+
+I've used the same parsing routines for both the command line parsing and the 
+data file parsing.  Those routines, to_float(), etc. are very conservative to be 
+able to catch errors from user input on the command line.  As for the data file 
+parsing, I would think that if that data is machine generated the line format 
+will be fixed, and a much simpler and more efficient parsing logic could be 
+used.
+
+The processing logic for the sensor data uses a moving average filter on the 
+data to remove noise followed by a simple limit check comparison of the 
+difference between sensor values.  The potentiometer values are scaled up to
+match the encoder values.
+
+I felt it would be worthwhile to have command line options that would allow the 
+user to specify values for the influential parameters used in the processing 
+logic.  The program works as expected on the provided normal.txt and error.txt 
+data files with the default values of these options, but with the ability to set 
+these options on the command line the program should be able to be used on data 
+with different characteristics.  I have also added two program options, 
+'--show-filtered' and '--show-stats', which I found to be very useful  when 
+analyzing the data to choose default values for the filter lengths and error 
+limit.  
+
+## Usage
+
+```
+servo-check - Servo motor sensor check.
+Usage: Usage: servo-check [flags] data-file
+Option flags:
+  -h --help          - Show this help and exit.
+  -v --verbose       - Verbose execution.
+  -V --version       - Display the program version number.
+  --e-len            - Encoder filter length (e-len > 1).  Default: '400'.
+  --p-len            - Potentiometer filter length (p-len > 1).  Default: '400'.
+  --error-limit      - Error detection limit (error-limit > 1).  Default: '400'.
+  --phase-lag        - Phase adjustment in seconds.  Default: '0.200500'.
+  -f --show-filtered - Print filtered signal data to stdout.
+  -s --show-stats    - Print signal stats to stdout at program exit.
+Send bug reports to geoff@infradead.org.
+```
+
+## Typical Output
+
+```
+System OK
+------------------------------------------------------------------------
+params:      e-len = 400, p-len = 400
+enc:         min = {3.693000, -10849}, max = {2.691000, 17839}
+pot:         min = {3.696000, -10655}, max = {2.688000, 18143}
+signal diff: min = {0.003000, 194}, max = {-0.003000, 304} => -110
+sample diff: enc = {3.112000, 9409}, pot = {3.112000, 9752} => 343
+------------------------------------------------------------------------
+```
+
+```
+Sensor Error: 2.881500
+------------------------------------------------------------------------
+params:      e-len = 400, p-len = 400
+enc:         min = {1.018000, 0}, max = {2.691000, 17839}
+pot:         min = {3.696000, -10655}, max = {2.688000, 18143}
+signal diff: min = {2.678000, -10655}, max = {-0.003000, 304} => -10959
+sample diff: enc = {3.690000, 7363}, pot = {3.690000, -10655} => 18018
+------------------------------------------------------------------------
+```

@@ -1,0 +1,20 @@
+{
+	"name": "servo-check",
+
+	"files": [ {
+		"directory": ".",
+		"filters": ["*.c", "*.h", "*.sh", "bootstrap", "Makefile.am", "configure.ac"],
+		"recursive": 1
+	} ],
+
+	"build": {
+		"directory": "/home/geoff/projects/builds/native/servo-check",
+		"targets":[
+			{"name":"build", "build_cmd":"make"},
+			{"name":"clean", "build_cmd":"make clean"},
+			{"name":"configure", "build_cmd":"set -x; rm -rf /home/geoff/projects/builds/native/servo-check/*; rm -rf /home/geoff/projects/builds/native/servo-check/.*; (cd /home/geoff/projects/servo-check && ./bootstrap) && /home/geoff/projects/servo-check/configure --enable-debug"}
+		],
+		"default_target": "build",
+		"clean_target": "clean"
+	}
+}
