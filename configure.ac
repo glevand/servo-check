@@ -1,7 +1,7 @@
 ## configure.ac -- Process this file with autoconf to produce configure
 
 AC_INIT([servo-check],
-    [1.0],
+    [1.1],
     [geoff@infradead.org])
 
 AC_CONFIG_MACRO_DIR([m4])

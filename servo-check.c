@@ -100,7 +100,7 @@ static int opts_parse(struct opts *opts, int argc, char *argv[])
 		.e_len = 400,
 		.p_len = 400,
 		.error_limit = 400,
-		.phase_lag = HUGE_VALF,
+		.phase_lag = (0.0f - HUGE_VALF),
 		.show_stats = opt_no,
 		.show_filtered = opt_no,
 		.file_name = NULL,
@@ -499,7 +499,7 @@ int main(int argc, char *argv[])
 		return EXIT_FAILURE;
 	}
 
-	if (opts.phase_lag == HUGE_VALF) {
+	if (opts.phase_lag == (0.0f - HUGE_VALF)) {
 		opts.phase_lag = (float)(opts.e_len + opts.p_len) / 4000.0f;
 	}
 	
