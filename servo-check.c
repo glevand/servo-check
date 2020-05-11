@@ -432,7 +432,9 @@ static int process_line(struct filter_pair *filters, char *str,
 			ave.encoder.value, ave.pot.value);
 	}
 
-	stats_update(&filters->stats, &ave);
+	if (control->show_stats) {
+		stats_update(&filters->stats, &ave);
+	}
 
 	result = servo_data_process(&ave, &filters->cal);
 
@@ -474,7 +476,7 @@ static int process_file(struct filter_pair *filters, const char *file,
 			break;
 		}
 
-		result += process_line(filters, line_data, control);
+		result = process_line(filters, line_data, control) ? 1 : result;
 
 		if (result && !control->show_filtered && !control->show_stats) {
 			break;
@@ -553,7 +555,6 @@ int main(int argc, char *argv[])
 
 	ave_filter_delete(filters.e_filter);
 	ave_filter_delete(filters.p_filter);
-	
 
 	return result ? EXIT_FAILURE : EXIT_SUCCESS;
 }
