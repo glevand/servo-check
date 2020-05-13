@@ -445,6 +445,7 @@ static int process_file(struct filter_pair *filters, const char *file,
 	const struct control *control)
 {
 	char *line_data;
+	size_t bytes;
 	int result;
 	int line;
 	FILE *fp;
@@ -457,8 +458,7 @@ static int process_file(struct filter_pair *filters, const char *file,
 		exit(EXIT_FAILURE);
 	}
 
-	for (line = 1, line_data = NULL, result = 0; ; line++) {
-		size_t bytes;
+	for (line = 1, line_data = NULL, bytes = result = 0; ; line++) {
 
 		bytes = getline(&line_data, &bytes, fp);
 
