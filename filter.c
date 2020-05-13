@@ -55,9 +55,7 @@ void ave_filter_delete(struct ave_filter *f)
 
 int ave_filter_run(struct ave_filter *f, int x)
 {
-	float y;
-
-	y = (float)(x + f->sum) / (float)f->len;
+	int y;
 
 	f->sum -= *f->head;
 	*f->head = x;
@@ -65,13 +63,15 @@ int ave_filter_run(struct ave_filter *f, int x)
 
 	f->head = (f->head < f->end) ? f->head + 1 : f->data; 
 
+	y = f->sum / (int)f->len;
+
 	if (0) {
 		debug("data = %p, head = %p, end = %p\n", f->data, f->head,
 			f->end);
 		print_array(f->data, f->len);
-		debug("y = %f, sum = %d\n  ", y, f->sum);
+		debug("y = %d, sum = %d\n  ", y, f->sum);
 		debug("{%d, %d}\n", x, (int)y);
 	}
 
-	return (int)y;
+	return y;
 }
