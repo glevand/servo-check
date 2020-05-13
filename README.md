@@ -20,6 +20,61 @@ Option flags:
 Send bug reports to geoff@infradead.org.
 ```
 
+## Program Flow
+
+```
+=====
+main:
+=====
+
+[start]->[parse opts]->[initialize parameters]->[(process file)]->[cleanup]->[end]
+
+=============
+process file:
+=============
+
+->[open file]--->[read line]->[(process line)]-+->[close file]->
+              ^                                |
+              +--------------------------------+
+
+=============
+process line:
+=============
+                 +----------------+
+                 |                V
+->[parse line]->-+->[calibration]--->[(run filters)]->[update stats]->[(process data)]->
+
+============
+run filters:
+============
+
+ave_encoder_value = filter(raw_encoder_value);
+
+scaled_pot_value = scale(raw_pot_value);
+ave_raw_pot_value = filter(scaled_pot_value);
+
+=============
+process data:
+=============
+                                  +--------------------+
+                                  |                    V
+->[calculate error]->[test limit]--->[print error msg]--->
+
+======================
+moving average filter:
+======================
+
+y = (x + x[n-1] + ... + x[n-len-1]) / len
+
+y = sum / len
+
+sum = sum - oldest_x + x
+
+
+data[] = { x[5], x[1], x[2], x[3], x[4] }
+                  ^ head
+```
+
 ## Typical Output
 
 ```
