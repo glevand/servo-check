@@ -101,4 +101,4 @@ sample diff: enc = {3.690000, 7363}, pot = {3.690000, -10655} => 18018
 
 ## Licence
 
-All files in the [servo-check project](./servo-check), unless otherwise noted, are covered by an [MIT Plus License](./servo-check/mit-plus-license.txt).  The text of the license describes what usage is allowed.
+All files in the [servo-check project](./servo-check), unless otherwise noted, are covered by an [MIT Plus License](https://github.com/glevand/servo-check/blob/master/mit-plus-license.txt).  The text of the license describes what usage is allowed.
