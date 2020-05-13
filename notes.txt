@@ -72,7 +72,7 @@ run filters:
 ave_encoder_value = filter(raw_encoder_value);
 
 scaled_pot_value = scale(raw_pot_value);
-ave_raw_pot_value = filter(scaled_pot_value);
+ave_pot_value = filter(scaled_pot_value);
 
 =============
 process data:
