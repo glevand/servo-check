@@ -303,6 +303,7 @@ static void calibration_init(struct calibration *cal, int error_limit,
 
 static void calibration_set(struct calibration *cal, int pot_offset)
 {
+	debug("pot_offset = %d\n", pot_offset);
 	cal->pot_offset = pot_offset;
 }
 
@@ -323,7 +324,7 @@ static int servo_data_process(const struct servo_data *sd,
 	return 0;
 }
 
-static int pot_scaler(int pot_value, const struct calibration *cal)
+static int pot_scaler(int pot_value)
 {
 	float f;
 
@@ -335,10 +336,10 @@ static int pot_scaler(int pot_value, const struct calibration *cal)
 	 * 2048 * 30 / 255 enc-ticks / pot-tick
 	 */
 
-	f = (float)(pot_value - cal->pot_offset) * (2048.0f * 30.0f) / 255.0f;
+	f = (float)pot_value * (2048.0f * 30.0f) / 255.0f;
 	//debug("%d => %f\n", pot_value, f);
 
-	return f;
+	return (int)f;
 }
 
 struct control {
@@ -414,18 +415,22 @@ static int process_line(struct filter_pair *filters, char *str,
 	debug("raw: %f %d %d\n", raw.pot.time, raw.encoder.value,
 		raw.pot.value);
 
+	ave.pot.time = ave.encoder.time = raw.encoder.time;
+if (0) {
+	ave.encoder.value = ave_filter_run(filters->e_filter,
+		raw.encoder.value);
+}
+
+if (1) {
+	ave.pot.value = ave_filter_run(filters->p_filter,
+		pot_scaler(raw.pot.value) - filters->cal.pot_offset);
+}
+
 	if (raw.pot.time <= 0.5f
 		&& (roundf(10.0f * raw.pot.time) == (10.0f * raw.pot.time))) {
 		stats_reset(&filters->stats);
-		calibration_set(&filters->cal, raw.pot.value);
+		calibration_set(&filters->cal, ave.pot.value);
 	}
-
-	ave.pot.time = ave.encoder.time = raw.encoder.time;
-	ave.encoder.value = ave_filter_run(filters->e_filter,
-		raw.encoder.value);
-
-	ave.pot.value = ave_filter_run(filters->p_filter,
-		pot_scaler(raw.pot.value, &filters->cal));
 
 	if (control->show_filtered) {
 		fprintf(stdout, "%f %d %d\n", ave.encoder.time,
