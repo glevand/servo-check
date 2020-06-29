@@ -14,17 +14,17 @@
 #include "util.h"
 
 struct ave_filter {
-	unsigned int len;
+	int len;
 	int sum;
 	int *head;
 	int *end;
 	int data[];
 };
 
-struct ave_filter *ave_filter_init(unsigned int len)
+struct ave_filter *ave_filter_init(int len)
 {
 	struct ave_filter *f;
-	unsigned int d_bytes;
+	int d_bytes;
 
 	assert(len);
 
@@ -58,19 +58,17 @@ int ave_filter_run(struct ave_filter *f, int x)
 	int y;
 
 	f->sum -= *f->head;
-	*f->head = x;
-	f->sum += *f->head;
+	f->sum += x;
 
+	*f->head = x;
 	f->head = (f->head < f->end) ? f->head + 1 : f->data; 
 
-	y = f->sum / (int)f->len;
+	y = f->sum / f->len;
 
-	if (0) {
-		debug("data = %p, head = %p, end = %p\n", f->data, f->head,
-			f->end);
-		print_array(f->data, f->len);
-		debug("y = %d, sum = %d\n  ", y, f->sum);
-		debug("{%d, %d}\n", x, (int)y);
+	if (1) {
+		//debug("data = %p, head = %p, end = %p\n", f->data, f->head, f->end);
+		//print_array(f->data, f->len);
+		debug("{%d, %d}, sum = %d\n", x, y, f->sum);
 	}
 
 	return y;
